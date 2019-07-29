@@ -14,16 +14,18 @@ using System.Xml.Linq;
 
 
 // https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki/Client-Applications
+// https://docs.microsoft.com/en-us/azure/active-directory-b2c/tutorial-create-tenant
 
 namespace MSALConsole
 {
+    
     class Program
     {
         // Configuration data:
-        // Azure AD B2C Coordinates
-        public static string Domain = "mrochonb2cprod";
+        // Azure AD B2C Configuration Variables
+        public static string Domain = "B2C tenant name"; //replace with your own tenant name
         public static string Tenant = $"{Domain}.onmicrosoft.com";
-        public static string ClientId = "4b457bbe-3a13-40a3-9db4-8ae430395680";
+        public static string ClientId = "cliend id provided during registration";
         public static string PolicySignUpSignIn = "B2C_1_BasicSUSI";
         public static string PolicyEditProfile = "b2c_1_edit_profile";
         public static string PolicyResetPassword = "B2C_1_PwdReset";
@@ -32,16 +34,16 @@ namespace MSALConsole
         public static string Authority = $"{AuthorityBase}{PolicySignUpSignIn}";
         public static string AuthorityEditProfile = $"{AuthorityBase}{PolicyEditProfile}";
         public static string AuthorityPasswordReset = $"{AuthorityBase}{PolicyResetPassword}";
-        public static string[] Scopes = new string[] { "https://mrochonb2cprod.onmicrosoft.com/webapi/read_policies" };
+        public static string[] Scopes = new string[] { "https://tenant.onmicrosoft.com/webapi/read_policies" };
 
 
         // Registered app in AAD
-        //static string _authority = "https://login.microsoftonline.com/tfp/mrochonb2cprod.onmicrosoft.com/B2C_1_BasicSUSI/oauth2/v2.0/authorize";
+        //static string _authority = "https://login.microsoftonline.com/tfp/tenant.onmicrosoft.com/B2C_1_BasicSUSI/oauth2/v2.0/authorize";
         //static string _authorityFormat = "https://{0}.b2clogin.com/tfp/{0}.onmicrosoft.com/{1}/oauth2/v2.0/authorize";
-        //static string _publicClientId = "4b457bbe-3a13-40a3-9db4-8ae430395680";
-        //static string[] _publicClientScopes = new string[] { "https://mrochonb2cprod.onmicrosoft.com/webapi/read_policies" };
+        //static string _publicClientId = "clientid";
+        //static string[] _publicClientScopes = new string[] { "https://tenant.onmicrosoft.com/webapi/read_policies" };
         ////static string _publicClientRedirectUri = "urn:ietf:wg:oauth:2.0:oob";
-        //static string _tenantShortName = "mrochonb2cprod";
+        //static string _tenantShortName = "tenant";
         //static string _susiPolicy = "B2C_1_BasicSUSI";
         //static string _pwdResetPolicy = "B2C_1_PwdReset";
 
@@ -85,13 +87,16 @@ namespace MSALConsole
             }
             ShowTokens(tokens);
         }
+
+        ///Do not use Resource Owner in production scenarios, this is a flawed grant or flow.
         private async Task UseResourceOwnerAsync()
         {
+            
             Console.WriteLine("Resource Owner - public client");
             try
             {
-                Authority = "https://login.microsoftonline.com/tfp/mrochonb2cprod.onmicrosoft.com/B2C_1_ROP/.well-known/openid-configuration";
-                //Authority = "https://mrochonb2cprod.b2clogin.com/mrochonb2cprod.onmicrosoft.com/B2C_1_ROP/v2.0/";
+                Authority = $"https://login.microsoftonline.com/tfp/{Tenant}/B2C_1_ROP/.well-known/openid-configuration";
+                //Authority = $"https://{Domain}.b2clogin.com/{Tenant}/B2C_1_ROP/v2.0/";
                 var pwd = new SecureString();
                 foreach (var c in "Pass@word#1") pwd.AppendChar(c);
                 var app = PublicClientApplicationBuilder
